@@ -1,66 +1,83 @@
+<div align="center">
+
+<img src="apps/web/src/assets/fouad-cli-terminal.png" alt="Fouad CLI terminal interface" width="920" />
+
 # Fouad CLI
 
-![Fouad CLI](apps/web/src/assets/fouad-cli-terminal.png)
+### A focused AI workspace for builders who live in the terminal.
 
-[![Open Source](https://img.shields.io/badge/open%20source-Apache--2.0-4ade80?style=flat-square)](LICENSE)
-[![Node.js](https://img.shields.io/badge/Node.js-22%2B-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
-[![Website](https://img.shields.io/badge/website-live-4ade80?style=flat-square)](https://fouad-cli-platform.fouadzulof26.workers.dev/)
-[![npm](https://img.shields.io/npm/v/fouad-ai?style=flat-square&logo=npm)](https://www.npmjs.com/package/fouad-ai)
+Build, inspect, and ship with model-assisted workflows, local tools, plugins,
+and skills — without leaving your workspace.
 
-Fouad CLI is an open-source AI coding workspace for the terminal. It brings
-model-assisted development, slash commands, local tools, plugins, skills, and
-secure account linking into one focused command-line experience.
+<p>
+  <a href="https://fouad-cli-platform.fouadzulof26.workers.dev/"><strong>Visit the website</strong></a> ·
+  <a href="https://fouad-cli-platform.fouadzulof26.workers.dev/download"><strong>Install Fouad</strong></a> ·
+  <a href="https://fouad-cli-platform.fouadzulof26.workers.dev/docs"><strong>Read the docs</strong></a>
+</p>
 
-## Live platform
+<p>
+  <a href="https://github.com/fouadcyper/fouad-ai-cli/stargazers"><img src="https://img.shields.io/github/stars/fouadcyper/fouad-ai-cli?style=flat-square&color=4ade80" alt="GitHub stars" /></a>
+  <a href="https://github.com/fouadcyper/fouad-ai-cli/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-4ade80?style=flat-square" alt="Apache 2.0 license" /></a>
+  <a href="https://www.npmjs.com/package/fouad-ai"><img src="https://img.shields.io/npm/v/fouad-ai?style=flat-square&logo=npm" alt="npm version" /></a>
+  <a href="https://github.com/fouadcyper/fouad-ai-cli/actions"><img src="https://img.shields.io/github/actions/workflow/status/fouadcyper/fouad-ai-cli/ci.yml?style=flat-square&label=checks" alt="CI status" /></a>
+</p>
 
-- **GitHub repository:** [github.com/fouadcyper/fouad-ai-cli](https://github.com/fouadcyper/fouad-ai-cli)
-- **Website:** [fouad-cli-platform.fouadzulof26.workers.dev](https://fouad-cli-platform.fouadzulof26.workers.dev/)
-- **Download:** [Installation guide](https://fouad-cli-platform.fouadzulof26.workers.dev/download)
-- **Documentation:** [Fouad CLI Docs](https://fouad-cli-platform.fouadzulof26.workers.dev/docs)
-- **Sign in:** [Account login](https://fouad-cli-platform.fouadzulof26.workers.dev/login)
-- **Open source license:** [Apache-2.0](LICENSE)
+</div>
 
-## Interface preview
+## The short version
 
-### Terminal interface
-
-![Fouad CLI terminal interface](apps/web/src/assets/fouad-cli-terminal.png)
-
-### Website homepage
-
-![Fouad CLI homepage](artifacts/screenshots/redesign-live/home-desktop.png)
-
-### Download page
-
-![Fouad CLI download page](artifacts/screenshots/redesign-live/download-mobile.png)
-
-### Documentation
-
-![Fouad CLI documentation](artifacts/screenshots/redesign-live/docs-desktop.png)
-
-### Admin workspace
-
-![Fouad CLI admin workspace](artifacts/screenshots/redesign-live/admin-desktop.png)
-
-## Install
+Fouad CLI is an open-source AI coding workspace for the command line. It keeps
+the interaction close to your codebase and makes the important boundaries
+visible: the active provider, permissions, tools, sessions, and account state.
 
 ```bash
 npm install -g fouad-ai
-fouad --version
 fouad
 ```
 
-The global install makes the `fouad` command available from any project
-directory. To connect a CLI device to the hosted account, run:
+|   Local-first workflow    |  Extensible by design  |           Safe hosted gateway            |
+| :-----------------------: | :--------------------: | :--------------------------------------: |
+| llama.cpp · Ollama · GGUF | plugins · skills · MCP | explicit providers · server-side secrets |
+
+## See it in action
+
+<table>
+  <tr>
+    <td width="50%"><img src="artifacts/screenshots/redesign-live/home-desktop.png" alt="Fouad CLI homepage" /></td>
+    <td width="50%"><img src="artifacts/screenshots/redesign-live/docs-desktop.png" alt="Fouad CLI documentation" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Product overview</sub></td>
+    <td align="center"><sub>Developer documentation</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="artifacts/screenshots/redesign-live/download-mobile.png" alt="Fouad CLI download page" /></td>
+    <td width="50%"><img src="artifacts/screenshots/redesign-live/admin-desktop.png" alt="Fouad CLI admin workspace" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Install from any device</sub></td>
+    <td align="center"><sub>Provider administration</sub></td>
+  </tr>
+</table>
+
+## Quick start
+
+```bash
+# Install globally — available from every project directory
+npm install -g fouad-ai
+fouad --version
+fouad doctor
+fouad
+```
+
+Connect a CLI device securely:
 
 ```bash
 fouad login
 fouad whoami
 ```
 
-## Download from GitHub
-
-Anyone can download the complete open-source project directly from GitHub:
+Download and build the complete project from GitHub:
 
 ```bash
 git clone https://github.com/fouadcyper/fouad-ai-cli.git
@@ -71,106 +88,101 @@ npm link
 fouad --version
 ```
 
-**Repository URL:**
+Or use the [ZIP download](https://github.com/fouadcyper/fouad-ai-cli/archive/refs/heads/main.zip).
+
+## Why Fouad CLI
+
+| Capability                  | What it means in practice                                                                           |
+| --------------------------- | --------------------------------------------------------------------------------------------------- |
+| **Terminal-native**         | Stream responses, run slash commands, inspect diffs, and keep sessions beside your code.            |
+| **Provider choice**         | Use Gemini, OpenAI-compatible endpoints, Ollama, llama.cpp, or an explicit custom adapter.          |
+| **Local models**            | Local GGUF inference stays on the device and never silently falls back to cloud.                    |
+| **Plugins and skills**      | Extend commands and context through permissioned, inspectable packages.                             |
+| **Permission boundaries**   | Workspace access, command approvals, path checks, and secret redaction are explicit.                |
+| **Browser account linking** | Connect a CLI device with short-lived authorization instead of copying passwords into the terminal. |
+
+## Useful commands
 
 ```text
-https://github.com/fouadcyper/fouad-ai-cli.git
+fouad setup       First-run hardware and model setup
+fouad chat        Open the interactive terminal workspace
+fouad ask "..."   Ask one question and exit
+fouad doctor      Diagnose installation and runtime issues
+fouad models      List, import, verify, and select models
+fouad providers   Inspect configured provider adapters
+fouad plugins     Manage permissioned extensions
+fouad skills      Manage reusable instruction packages
+fouad mcp         Connect and inspect MCP servers
+fouad sessions    Resume, export, or manage local sessions
 ```
 
-You can also download a ZIP archive from the repository’s **Code → Download
-ZIP** menu:
+## Live links
 
-[Download Fouad CLI as ZIP](https://github.com/fouadcyper/fouad-ai-cli/archive/refs/heads/main.zip)
+- **GitHub:** [fouadcyper/fouad-ai-cli](https://github.com/fouadcyper/fouad-ai-cli)
+- **Website:** [fouad-cli-platform.fouadzulof26.workers.dev](https://fouad-cli-platform.fouadzulof26.workers.dev/)
+- **Download:** [Install Fouad CLI](https://fouad-cli-platform.fouadzulof26.workers.dev/download)
+- **Documentation:** [Fouad CLI Docs](https://fouad-cli-platform.fouadzulof26.workers.dev/docs)
+- **Sign in:** [Account login](https://fouad-cli-platform.fouadzulof26.workers.dev/login)
+- **Dashboard:** [Open dashboard](https://fouad-cli-platform.fouadzulof26.workers.dev/dashboard)
+- **Admin:** [Open admin dashboard](https://fouad-cli-platform.fouadzulof26.workers.dev/admin)
+- **npm:** [npmjs.com/package/fouad-ai](https://www.npmjs.com/package/fouad-ai)
 
-### Package and platform links
-
-- **npm package:** [npmjs.com/package/fouad-ai](https://www.npmjs.com/package/fouad-ai)
-- **Live website:** [fouad-cli-platform.fouadzulof26.workers.dev](https://fouad-cli-platform.fouadzulof26.workers.dev/)
-- **Download page:** [Install Fouad CLI](https://fouad-cli-platform.fouadzulof26.workers.dev/download)
-- **Account dashboard:** [Open dashboard](https://fouad-cli-platform.fouadzulof26.workers.dev/dashboard)
-- **Admin dashboard:** [Open admin](https://fouad-cli-platform.fouadzulof26.workers.dev/admin)
-
-## What is included
-
-- Terminal-first AI coding workflow with streaming responses.
-- Gemini, OpenAI-compatible, Ollama, llama.cpp, and explicit custom providers.
-- Local model support with no silent cloud fallback.
-- Slash commands, model selection, sessions, plugins, skills, and MCP tools.
-- Workspace permissions, path-safety checks, secret redaction, and safe-mode.
-- Browser-based CLI account linking with short-lived device authorization.
-- Cloudflare Worker gateway and Supabase-backed account platform.
-- Admin provider registry that stores secret references, never API key values.
-
-## Development
+## Develop locally
 
 ```bash
-git clone <your-fork-url>
-cd fouad-ai-cli
 npm install
 npm run check
 npm run platform:check
+npm run web:dev
 ```
 
-Build and preview the web platform locally:
+Build and preview the web platform:
 
 ```bash
 npm run web:build
 npm run web:preview
 ```
 
-Deploy the existing Cloudflare Worker after configuring its secrets privately:
+Deploy the existing Cloudflare Worker after configuring secrets privately:
 
 ```bash
 npm run platform:deploy:dry
 npm run platform:deploy
 ```
 
-Never commit API keys, Supabase service-role credentials, Wrangler tokens, or
-model weights. See [SECURITY.md](SECURITY.md) before contributing.
+## Open source and security
 
-## Project documentation
+Fouad CLI is currently open source under the [Apache-2.0 license](LICENSE).
+Contributions, provider adapters, plugins, skills, documentation, and bug
+reports are welcome. Read [SECURITY.md](SECURITY.md) before reporting a
+security issue.
+
+Never commit API keys, Supabase service-role credentials, Wrangler tokens, or
+model weights. Provider keys belong in Worker secrets; the admin UI stores only
+the secret name reference.
+
+## Documentation map
 
 - [Architecture](docs/ARCHITECTURE.md)
 - [AI provider management](docs/AI_PROVIDER_MANAGEMENT.md)
-- [Cloudflare deployment](docs/CLOUDFLARE_SETUP.md)
+- [Cloudflare setup](docs/CLOUDFLARE_SETUP.md)
 - [Supabase setup](docs/SUPABASE_SETUP.md)
 - [CLI authentication flow](docs/CLI_AUTH_FLOW.md)
 - [Security model](docs/SECURITY_MODEL.md)
 - [Plugins](docs/PLUGINS.md) · [Skills](docs/SKILLS.md) · [MCP](docs/MCP.md)
 - [Contributing](CONTRIBUTING.md)
 
-## Open source
-
-Fouad CLI is currently released as open source under the Apache-2.0 license.
-Contributions, bug reports, provider adapters, plugins, and documentation
-improvements are welcome. Hosted provider limits and free-tier policies are
-controlled by the selected provider and may change independently of this
-project.
-
-## License
-
-Original Fouad CLI code is licensed under [Apache-2.0](LICENSE). Third-party
-software and model licenses are listed in
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and
-[MODEL_LICENSES.md](MODEL_LICENSES.md).
-
 ## Verification
 
-The current local verification completes successfully with formatting, lint,
-web and Worker type checks, production build, and the full Vitest suite,
-including the pseudo-terminal flow for `/help`.
+The current checkout passes formatting, lint, web and Worker type checks,
+production build, and the full Vitest suite.
 
 ```text
 15 test files passed · 46 tests passed
 ```
 
-The project is ready to push to GitHub. A GitHub remote is intentionally not
-configured in this checkout, so no repository was created or pushed
-automatically. Add your own remote, then push the branch:
+<div align="center">
 
-```bash
-git remote add origin https://github.com/YOUR_ACCOUNT/fouad-ai-cli.git
-git add .
-git commit -m "docs: add GitHub project README and interface previews"
-git push -u origin main
-```
+**Fouad CLI · open source · terminal-first · built for real work**
+
+</div>
