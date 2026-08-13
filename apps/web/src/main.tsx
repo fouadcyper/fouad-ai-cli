@@ -104,6 +104,10 @@ const docs = {
     'Security and privacy',
     'Secrets stay server-side. Local files require explicit permissions.',
   ],
+  '/docs/web': [
+    'Fouad CLI Web',
+    'Use the secure browser workspace, files, diffs, and hosted AI gateway.',
+  ],
 } as const;
 
 const nav = [
@@ -159,6 +163,9 @@ function App() {
           <Link className="button button-small desktop-only" to="/register">
             Create account
           </Link>
+          <Link className="button button-small desktop-only" to="/app">
+            Open Fouad CLI Web
+          </Link>
           <button
             className="icon-button mobile-only"
             onClick={() => setMenu(!menu)}
@@ -177,6 +184,14 @@ function App() {
           ))}
           <Route path="/login" element={<Auth mode="login" />} />
           <Route path="/register" element={<Auth mode="register" />} />
+          <Route
+            path="/app"
+            element={
+              <Protected>
+                <WebApp />
+              </Protected>
+            }
+          />
           <Route
             path="/cli/authorize"
             element={
@@ -287,6 +302,7 @@ function App() {
 }
 
 function Protected({ children, role }: { children: React.ReactNode; role?: 'admin' }) {
+  const location = useLocation();
   const [state, setState] = useState<{
     loading: boolean;
     user: CurrentUser | null;
@@ -324,7 +340,7 @@ function Protected({ children, role }: { children: React.ReactNode; role?: 'admi
   if (!state.user)
     return (
       <Page title="Sign in required" intro="Sign in before opening this protected page.">
-        <Link className="button" to="/login">
+        <Link className="button" to={`/login?next=${encodeURIComponent(location.pathname)}`}>
           Sign in
         </Link>
       </Page>
@@ -350,6 +366,9 @@ function Home() {
           <div className="button-row">
             <Link className="button" to="/download">
               Install Fouad CLI <ArrowRight />
+            </Link>
+            <Link className="button secondary" to="/app">
+              Open Fouad CLI Web <ArrowRight />
             </Link>
             <Link className="button secondary" to="/docs/getting-started">
               View documentation
@@ -426,6 +445,24 @@ function Home() {
         <Link className="arrow-link" to="/docs/getting-started">
           Read the quick start <ArrowRight />
         </Link>
+      </section>
+      <section className="section-wrap web-promo">
+        <div>
+          <p className="eyebrow">Fouad CLI Web</p>
+          <h2>Your coding workspace, now in the browser.</h2>
+          <p>
+            Open a protected browser workspace for hosted AI, local-only files, diffs, and a
+            command-planning terminal. Execution stays disabled until a trusted local connection is
+            explicitly approved.
+          </p>
+          <Link className="button" to="/app">
+            Open Fouad CLI Web <ArrowRight />
+          </Link>
+        </div>
+        <div className="web-promo-preview">
+          <span className="status-dot" /> Browser workspace <strong>safe by default</strong>
+          <code>/files · /diff · /models</code>
+        </div>
       </section>
       <section className="section-wrap privacy-panel">
         <div>
@@ -585,6 +622,316 @@ function Copy({ text }: { text: string }) {
   );
 }
 
+type WebMessage = { id: string; role: 'user' | 'assistant'; content: string; pending?: boolean };
+type WebFile = { path: string; content: string; savedAt: number };
+
+function WebApp() {
+  const [sidebar, setSidebar] = useState(true);
+  const [prompt, setPrompt] = useState('');
+  const [model, setModel] = useState('default');
+  const [status, setStatus] = useState<ApiState>({ loading: false, error: '', success: '' });
+  const [messages, setMessages] = useState<WebMessage[]>([]);
+  const [files, setFiles] = useState<WebFile[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem('fouad-web-files') ?? '[]') as WebFile[];
+    } catch {
+      return [];
+    }
+  });
+  const [activeFile, setActiveFile] = useState<string | null>(null);
+  const [command, setCommand] = useState('');
+  const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem('fouad-web-files', JSON.stringify(files));
+  }, [files]);
+
+  const send = async () => {
+    const text = prompt.trim();
+    if (!text || status.loading) return;
+    setPrompt('');
+    const userId = crypto.randomUUID();
+    const assistantId = crypto.randomUUID();
+    setMessages((current) => [
+      ...current,
+      { id: userId, role: 'user', content: text },
+      { id: assistantId, role: 'assistant', content: '', pending: true },
+    ]);
+    const controller = new AbortController();
+    abortRef.current = controller;
+    setStatus({ loading: true, error: '', success: '' });
+    try {
+      const response = await fetch('/api/v1/ai/chat', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ model, messages: [{ role: 'user', content: text }] }),
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        const payload = (await response.json().catch(() => ({}))) as {
+          error?: string;
+          requestId?: string;
+        };
+        throw new Error(
+          `${payload.error ?? 'The AI gateway is unavailable.'}${payload.requestId ? ` (request ${payload.requestId})` : ''}`,
+        );
+      }
+      if (!response.body) throw new Error('The AI gateway returned an empty stream.');
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let answer = '';
+      while (true) {
+        const chunk = await reader.read();
+        if (chunk.done) break;
+        buffer += decoder.decode(chunk.value, { stream: true });
+        for (const line of buffer.split('\n')) {
+          if (!line.startsWith('data:')) continue;
+          const value = line.slice(5).trim();
+          if (!value || value === '[DONE]') continue;
+          try {
+            const event = JSON.parse(value) as {
+              candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+            };
+            answer +=
+              event.candidates?.[0]?.content?.parts?.map((part) => part.text ?? '').join('') ?? '';
+          } catch {
+            // Ignore incomplete SSE frames; the next chunk completes them.
+          }
+        }
+        setMessages((current) =>
+          current.map((item) => (item.id === assistantId ? { ...item, content: answer } : item)),
+        );
+      }
+      setMessages((current) =>
+        current.map((item) =>
+          item.id === assistantId
+            ? { ...item, pending: false, content: answer || 'The provider returned no text.' }
+            : item,
+        ),
+      );
+      setStatus({ loading: false, error: '', success: '' });
+    } catch (error: unknown) {
+      const message =
+        error instanceof DOMException && error.name === 'AbortError'
+          ? 'Generation stopped.'
+          : error instanceof Error
+            ? error.message
+            : 'Generation failed.';
+      setMessages((current) => current.filter((item) => item.id !== assistantId));
+      setStatus({ loading: false, error: message, success: '' });
+    } finally {
+      abortRef.current = null;
+    }
+  };
+  const createFile = () => {
+    const path = window.prompt('New file path', 'notes.md')?.trim();
+    if (!path || path.includes('..') || path.startsWith('/')) return;
+    if (files.some((file) => file.path === path)) return setActiveFile(path);
+    setFiles((current) => [...current, { path, content: '', savedAt: Date.now() }]);
+    setActiveFile(path);
+  };
+  const active = files.find((file) => file.path === activeFile);
+  return (
+    <div className="web-app-shell">
+      <aside className={`web-sidebar${sidebar ? '' : ' collapsed'}`}>
+        <div className="web-sidebar-head">
+          <strong>Fouad Web</strong>
+          <button
+            className="icon-button"
+            onClick={() => setSidebar(false)}
+            aria-label="Collapse sidebar"
+          >
+            ‹
+          </button>
+        </div>
+        <button className="web-new-session" onClick={() => setMessages([])}>
+          + New session
+        </button>
+        <p className="web-label">Workspace</p>
+        <button className="web-list-item active">◈ Untitled session</button>
+        <p className="web-label">
+          Files{' '}
+          <button className="text-button" onClick={createFile}>
+            + Add
+          </button>
+        </p>
+        {files.map((file) => (
+          <button
+            className={`web-list-item${activeFile === file.path ? ' active' : ''}`}
+            key={file.path}
+            onClick={() => setActiveFile(file.path)}
+          >
+            ⌁ {file.path}
+          </button>
+        ))}
+        {!sidebar ? (
+          <button className="web-expand" onClick={() => setSidebar(true)}>
+            ›
+          </button>
+        ) : null}
+        <div className="web-sidebar-foot">
+          <span className="status-dot" /> Safe Browser Workspace
+        </div>
+      </aside>
+      <section className="web-main">
+        <header className="web-topbar">
+          {!sidebar ? (
+            <button
+              className="icon-button"
+              onClick={() => setSidebar(true)}
+              aria-label="Open sidebar"
+            >
+              ☰
+            </button>
+          ) : null}
+          <div>
+            <p className="eyebrow">Fouad CLI Web</p>
+            <h1>Build in the browser</h1>
+          </div>
+          <div className="web-top-actions">
+            <select
+              aria-label="Model"
+              value={model}
+              onChange={(event) => setModel(event.target.value)}
+            >
+              <option value="default">default model</option>
+              <option value="fast">fast</option>
+              <option value="local">local (CLI)</option>
+            </select>
+            <Link className="text-link" to="/dashboard">
+              Account
+            </Link>
+          </div>
+        </header>
+        <div className="web-workspace">
+          <section className="web-chat-panel">
+            <div className="web-chat-scroll">
+              {!messages.length ? (
+                <div className="web-empty">
+                  <span className="brand-mark">F</span>
+                  <h2>What are you building?</h2>
+                  <p>Ask Fouad to reason about code, files, architecture, or a next step.</p>
+                  <div className="web-suggestions">
+                    <button onClick={() => setPrompt('Review the current project structure')}>
+                      Review project structure
+                    </button>
+                    <button onClick={() => setPrompt('Help me plan a safe implementation')}>
+                      Plan an implementation
+                    </button>
+                    <button onClick={() => setPrompt('Explain this workspace')}>
+                      Explain this workspace
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                messages.map((message) => (
+                  <article className={`web-message ${message.role}`} key={message.id}>
+                    <span className="web-message-role">
+                      {message.role === 'user' ? 'You' : 'Fouad'}
+                    </span>
+                    <div>{message.content || (message.pending ? 'Thinking…' : '')}</div>
+                  </article>
+                ))
+              )}
+            </div>
+            {status.error ? <p className="form-error web-error">{status.error}</p> : null}
+            <div className="web-composer">
+              <textarea
+                value={prompt}
+                onChange={(event) => setPrompt(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    void send();
+                  }
+                }}
+                placeholder="Ask Fouad CLI Web…"
+                aria-label="Prompt"
+              />
+              <div className="web-composer-bar">
+                <span>Enter to send · Shift+Enter for newline</span>
+                {status.loading ? (
+                  <button className="button secondary" onClick={() => abortRef.current?.abort()}>
+                    Stop
+                  </button>
+                ) : (
+                  <button className="button" onClick={() => void send()} disabled={!prompt.trim()}>
+                    Send
+                  </button>
+                )}
+              </div>
+            </div>
+          </section>
+          <aside className="web-inspector">
+            <div className="web-inspector-tabs">
+              <button className="active">Files</button>
+              <button>Diff</button>
+              <button>Terminal</button>
+            </div>
+            {active ? (
+              <div className="web-editor">
+                <div className="web-editor-tab">
+                  {active.path}
+                  <span>●</span>
+                </div>
+                <textarea
+                  value={active.content}
+                  onChange={(event) =>
+                    setFiles((current) =>
+                      current.map((file) =>
+                        file.path === active.path
+                          ? { ...file, content: event.target.value, savedAt: Date.now() }
+                          : file,
+                      ),
+                    )
+                  }
+                  spellCheck={false}
+                  aria-label={`Edit ${active.path}`}
+                />
+              </div>
+            ) : (
+              <div className="web-inspector-empty">
+                <Code size={28} />
+                <h3>Browser workspace</h3>
+                <p>Create a file to edit it here. Files are isolated to this browser session.</p>
+                <button className="button secondary" onClick={createFile}>
+                  Create file
+                </button>
+              </div>
+            )}
+            <div className="web-terminal">
+              <div className="web-terminal-head">
+                <span>Preview terminal</span>
+                <span className="status-muted">Execution disabled</span>
+              </div>
+              <div className="web-terminal-output">
+                $ {command || 'Commands are planned here'}
+                <br />
+                <span>Connect a trusted local CLI to execute approved commands.</span>
+              </div>
+              <input
+                value={command}
+                onChange={(event) => setCommand(event.target.value)}
+                placeholder="Plan a command…"
+                aria-label="Command planner"
+              />
+            </div>
+          </aside>
+        </div>
+        <footer className="web-statusbar">
+          <span>
+            <span className="status-dot" /> Browser workspace
+          </span>
+          <span>Model: {model}</span>
+          <span>Local files: {files.length}</span>
+          <span>Terminal execution disabled</span>
+        </footer>
+      </section>
+    </div>
+  );
+}
+
 function Download() {
   const detected = /Win/i.test(navigator.userAgent)
     ? 'windows'
@@ -669,6 +1016,7 @@ function Download() {
 
 function Auth({ mode }: { mode: AuthMode }) {
   const navigate = useNavigate();
+  const next = new URLSearchParams(location.search).get('next');
   const [state, setState] = useState<ApiState>({ loading: false, error: '', success: '' });
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -696,7 +1044,7 @@ function Auth({ mode }: { mode: AuthMode }) {
             ? 'Signed in. Open your dashboard.'
             : 'Account created. You can sign in now.',
       });
-      window.setTimeout(() => navigate(mode === 'login' ? '/dashboard' : '/login'), 250);
+      window.setTimeout(() => navigate(mode === 'login' ? next || '/dashboard' : '/login'), 250);
     } catch (error) {
       setState({
         loading: false,
@@ -1002,6 +1350,7 @@ function Admin() {
           'Users',
           'Devices',
           'Providers',
+          'Fouad CLI Web',
           'Models',
           'Content',
           'Security',
@@ -1192,6 +1541,32 @@ function Admin() {
               </button>
             </form>
           ) : null}
+        </section>
+      ) : tab === 'Fouad CLI Web' ? (
+        <section className="admin-web-settings">
+          <p className="eyebrow">Web workspace controls</p>
+          <h2>Fouad CLI Web</h2>
+          <p className="notice">
+            The browser workspace is protected by account auth. Browser files are local-only until a
+            reviewed sync API is enabled.
+          </p>
+          <div className="provider-grid">
+            {[
+              'Web access enabled',
+              'Beta access',
+              'Connected local workspace',
+              'Maintenance mode',
+            ].map((label) => (
+              <div className="account-card" key={label}>
+                <span className="status-muted">Feature flag</span>
+                <h3>{label}</h3>
+                <p>
+                  Configure this flag through the reviewed platform settings API. No shell execution
+                  is enabled by default.
+                </p>
+              </div>
+            ))}
+          </div>
         </section>
       ) : (
         <div className="empty-state">

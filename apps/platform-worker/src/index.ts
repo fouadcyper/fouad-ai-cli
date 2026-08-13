@@ -51,6 +51,15 @@ const ProviderSchema = z.object({
   maintenance: z.boolean(),
 });
 const ProviderPatchSchema = ProviderSchema.partial();
+const WebChatSchema = z.object({
+  model: z.string().min(1).max(120).default('default'),
+  messages: z
+    .array(
+      z.object({ role: z.enum(['user', 'assistant']), content: z.string().min(1).max(64_000) }),
+    )
+    .min(1)
+    .max(40),
+});
 
 function isSafeProviderUrl(value: string) {
   try {
@@ -535,6 +544,44 @@ async function route(request: Request, env: Env) {
       return fail('PROVIDER_SAVE_FAILED', 'Unable to save provider settings', 400, id);
     return response({ provider: (await result.json<Array<Record<string, unknown>>>())[0] }, 200, {
       'x-request-id': id,
+    });
+  }
+  if (url.pathname === '/api/v1/ai/chat' && request.method === 'POST') {
+    const current = await identity(request, env);
+    if (!current) return fail('UNAUTHENTICATED', 'Sign in is required', 401, id);
+    if (!env.GOOGLE_AI_API_KEY)
+      return fail('AI_NOT_CONFIGURED', 'The hosted AI provider is not configured', 503, id);
+    const input = WebChatSchema.parse(await body(request));
+    const model =
+      input.model === 'default' || input.model === 'fast' ? 'gemini-3.1-flash-lite' : input.model;
+    const upstream = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse&key=${encodeURIComponent(env.GOOGLE_AI_API_KEY)}`,
+      {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          contents: input.messages.map((message) => ({
+            role: message.role === 'assistant' ? 'model' : 'user',
+            parts: [{ text: message.content }],
+          })),
+        }),
+      },
+    );
+    if (!upstream.ok)
+      return fail(
+        'AI_PROVIDER_FAILED',
+        'The hosted AI provider rejected the request',
+        upstream.status === 429 ? 429 : 502,
+        id,
+      );
+    return new Response(upstream.body, {
+      status: 200,
+      headers: {
+        'cache-control': 'no-store',
+        'content-type': 'text/event-stream; charset=utf-8',
+        'x-request-id': id,
+        'x-content-type-options': 'nosniff',
+      },
     });
   }
   if (url.pathname.startsWith('/api/v1/admin/') || url.pathname.startsWith('/api/v1/ai/'))
