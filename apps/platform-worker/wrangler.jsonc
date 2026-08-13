@@ -1,0 +1,24 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "fouad-cli-platform",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-13",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "../web/dist",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": true,
+  },
+  "vars": {
+    "SUPABASE_URL": "https://icpegitgbqdkuhgfqevh.supabase.co",
+    "PUBLIC_APP_URL": "https://fouad-cli-platform.fouadzulof26.workers.dev",
+    "NPM_PACKAGE_NAME": "fouad-ai",
+    "GITHUB_REPOSITORY_URL": "REPOSITORY_URL",
+  },
+  "observability": {
+    "enabled": true,
+    "logs": { "enabled": true, "head_sampling_rate": 1 },
+    "traces": { "enabled": true, "head_sampling_rate": 0.05 },
+  },
+}

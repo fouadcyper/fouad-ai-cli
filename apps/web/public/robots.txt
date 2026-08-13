@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://fouad-cli-platform.fouadzulof26.workers.dev/sitemap.xml

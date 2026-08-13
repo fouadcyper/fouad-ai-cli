@@ -1,0 +1,18 @@
+{
+  "id": "hello",
+  "name": "Hello World",
+  "version": "0.1.0",
+  "description": "Minimal greeting command",
+  "author": "FOUAD AI",
+  "license": "Apache-2.0",
+  "minimumCliVersion": "0.1.0",
+  "entrypoint": "index.js",
+  "capabilities": ["commands"],
+  "permissions": [],
+  "commands": ["hello"],
+  "tools": [],
+  "providers": [],
+  "hooks": [],
+  "settingsSchema": {},
+  "enabled": false
+}

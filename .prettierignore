@@ -1,0 +1,4 @@
+dist/
+apps/web/dist/
+worker/worker-configuration.d.ts
+apps/platform-worker/worker-configuration.d.ts

@@ -1,0 +1,3 @@
+# Copy to worker/.dev.vars for local development only.
+# Obtain a fresh publishable key from the target Supabase project.
+SUPABASE_PUBLISHABLE_KEY=replace-with-fresh-publishable-key
