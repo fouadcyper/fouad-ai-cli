@@ -609,13 +609,37 @@ function Download() {
       <div className="download-grid">
         <section className="install-panel">
           <div className="selector compact">
-            {['npm'].map((item) => (
+            {['npm', 'GitHub source'].map((item) => (
               <button key={item} aria-pressed={tab === item} onClick={() => setTab(item)}>
                 {item}
               </button>
             ))}
           </div>
-          <CommandBox command={command} shell={os === 'windows' ? 'PowerShell' : tab} />
+          {tab === 'npm' ? (
+            <CommandBox command={command} shell={os === 'windows' ? 'PowerShell' : tab} />
+          ) : (
+            <>
+              <p className="notice">
+                Clone the complete open-source project, then build and link the <code>fouad</code>{' '}
+                command locally.
+              </p>
+              <CommandBox
+                command={
+                  'git clone https://github.com/fouadcyper/fouad-ai-cli.git\ncd fouad-ai-cli\nnpm install\nnpm run build\nnpm link'
+                }
+                shell={os === 'windows' ? 'PowerShell' : 'bash'}
+                multiline
+              />
+              <a
+                className="arrow-link"
+                href="https://github.com/fouadcyper/fouad-ai-cli"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Open Fouad CLI on GitHub <ArrowRight />
+              </a>
+            </>
+          )}
         </section>
         <aside className="requirements">
           <h2>Requirements</h2>
