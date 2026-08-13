@@ -13,6 +13,7 @@ secure account linking into one focused command-line experience.
 
 ## Live platform
 
+- **GitHub repository:** [github.com/fouadcyper/fouad-ai-cli](https://github.com/fouadcyper/fouad-ai-cli)
 - **Website:** [fouad-cli-platform.fouadzulof26.workers.dev](https://fouad-cli-platform.fouadzulof26.workers.dev/)
 - **Download:** [Installation guide](https://fouad-cli-platform.fouadzulof26.workers.dev/download)
 - **Documentation:** [Fouad CLI Docs](https://fouad-cli-platform.fouadzulof26.workers.dev/docs)
@@ -56,6 +57,30 @@ directory. To connect a CLI device to the hosted account, run:
 fouad login
 fouad whoami
 ```
+
+## Download from GitHub
+
+Anyone can download the complete open-source project directly from GitHub:
+
+```bash
+git clone https://github.com/fouadcyper/fouad-ai-cli.git
+cd fouad-ai-cli
+npm install
+npm run build
+npm link
+fouad --version
+```
+
+**Repository URL:**
+
+```text
+https://github.com/fouadcyper/fouad-ai-cli.git
+```
+
+You can also download a ZIP archive from the repository’s **Code → Download
+ZIP** menu:
+
+[Download Fouad CLI as ZIP](https://github.com/fouadcyper/fouad-ai-cli/archive/refs/heads/main.zip)
 
 ### Package and platform links
 
