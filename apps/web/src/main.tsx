@@ -639,7 +639,6 @@ function WebApp() {
     }
   });
   const [activeFile, setActiveFile] = useState<string | null>(null);
-  const [command, setCommand] = useState('');
   const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
@@ -865,9 +864,9 @@ function WebApp() {
           </section>
           <aside className="web-inspector">
             <div className="web-inspector-tabs">
-              <button className="active">Files</button>
+              <button className="active">Artifacts</button>
+              <button>Files</button>
               <button>Diff</button>
-              <button>Terminal</button>
             </div>
             {active ? (
               <div className="web-editor">
@@ -900,23 +899,6 @@ function WebApp() {
                 </button>
               </div>
             )}
-            <div className="web-terminal">
-              <div className="web-terminal-head">
-                <span>Preview terminal</span>
-                <span className="status-muted">Execution disabled</span>
-              </div>
-              <div className="web-terminal-output">
-                $ {command || 'Commands are planned here'}
-                <br />
-                <span>Connect a trusted local CLI to execute approved commands.</span>
-              </div>
-              <input
-                value={command}
-                onChange={(event) => setCommand(event.target.value)}
-                placeholder="Plan a command…"
-                aria-label="Command planner"
-              />
-            </div>
           </aside>
         </div>
         <footer className="web-statusbar">
@@ -925,7 +907,7 @@ function WebApp() {
           </span>
           <span>Model: {model}</span>
           <span>Local files: {files.length}</span>
-          <span>Terminal execution disabled</span>
+          <span>Browser files stay local to this workspace</span>
         </footer>
       </section>
     </div>

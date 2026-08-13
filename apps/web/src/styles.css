@@ -877,39 +877,6 @@ code {
     0.8rem/1.65 ui-monospace,
     monospace;
 }
-.web-terminal {
-  border-top: 1px solid var(--line);
-}
-.web-terminal-head {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.7rem 0.9rem;
-  font-size: 0.75rem;
-}
-.web-terminal-output {
-  min-height: 92px;
-  padding: 0.9rem;
-  color: #b6e7c1;
-  background: #050706;
-  font:
-    0.75rem/1.6 ui-monospace,
-    monospace;
-}
-.web-terminal-output span {
-  color: var(--muted);
-}
-.web-terminal input {
-  width: 100%;
-  padding: 0.7rem 0.9rem;
-  color: var(--text);
-  background: transparent;
-  border: 0;
-  border-top: 1px solid var(--line);
-  outline: 0;
-  font:
-    0.75rem ui-monospace,
-    monospace;
-}
 .web-statusbar {
   display: flex;
   flex-wrap: wrap;
