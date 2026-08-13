@@ -52,11 +52,11 @@ fouad
   </tr>
   <tr>
     <td width="50%"><img src="artifacts/screenshots/redesign-live/download-mobile.png" alt="Fouad CLI download page" /></td>
-    <td width="50%"><img src="artifacts/screenshots/redesign-live/admin-desktop.png" alt="Fouad CLI admin workspace" /></td>
+    <td width="50%"><img src="apps/web/src/assets/fouad-cli-terminal.png" alt="Fouad CLI terminal workspace" /></td>
   </tr>
   <tr>
     <td align="center"><sub>Install from any device</sub></td>
-    <td align="center"><sub>Provider administration</sub></td>
+    <td align="center"><sub>Terminal workspace</sub></td>
   </tr>
 </table>
 
@@ -124,7 +124,6 @@ fouad sessions    Resume, export, or manage local sessions
 - **Documentation:** [Fouad CLI Docs](https://fouad-cli-platform.fouadzulof26.workers.dev/docs)
 - **Sign in:** [Account login](https://fouad-cli-platform.fouadzulof26.workers.dev/login)
 - **Dashboard:** [Open dashboard](https://fouad-cli-platform.fouadzulof26.workers.dev/dashboard)
-- **Admin:** [Open admin dashboard](https://fouad-cli-platform.fouadzulof26.workers.dev/admin)
 - **npm:** [npmjs.com/package/fouad-ai](https://www.npmjs.com/package/fouad-ai)
 
 ## Develop locally
@@ -158,7 +157,7 @@ reports are welcome. Read [SECURITY.md](SECURITY.md) before reporting a
 security issue.
 
 Never commit API keys, Supabase service-role credentials, Wrangler tokens, or
-model weights. Provider keys belong in Worker secrets; the admin UI stores only
+model weights. Provider keys belong in Worker secrets; the platform stores only
 the secret name reference.
 
 ## Documentation map
